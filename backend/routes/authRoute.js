@@ -15,7 +15,7 @@ const handleSignin = async (req, resp) => {
       console.log(user, identifier, password, req.body);
       return resp.send({ error: "Wrong password!" });
     }
-    const token = await generateJwtToken({ id: user[0]._id });
+    const token = await generateJwtToken({ id: user._id });
     return resp.send({ token: token, message: "Signin successful!" });
   } catch (error) {
     console.log(error);
@@ -26,24 +26,39 @@ const handleSignin = async (req, resp) => {
 const handleSignup = async (req, resp) => {
   try {
     const { username, email, password } = req.body;
-    if (!username || !email || !password)
-      return resp.send({ error: "Fill all the fields!" });
+    console.log(req.body);
+
+    // Check for missing fields
+    if (!username || !email || !password) {
+      return resp.status(400).send({ error: "Fill all the fields!" });
+    }
+
+    // Check if username exists
     let isExist = await User.findOne({ username });
-    if (isExist) return resp.send({ error: "username already exists" });
-    isExist = User.findOne({ email });
-    if (isExist) return resp.send({ error: "email already exists" });
+    if (isExist) {
+      return resp.status(400).send({ error: "Username already exists" });
+    }
+
+    // Check if email exists
+    isExist = await User.findOne({ email });
+    if (isExist) {
+      return resp.status(400).send({ error: "Email already exists" });
+    }
+
+    // Create a new user
     const _user = new User({ username, email, password });
     await _user.save();
-    return resp.send({
+
+    // Send success response
+    return resp.status(201).send({
       message: "Signup Successful",
       status: "Account created!",
     });
   } catch (error) {
     console.log(error);
-    return resp.send({ error: "server error!" });
+    return resp.status(500).send({ error: "Server error!" });
   }
 };
-
 Router.post("/signin", handleSignin);
 Router.post("/signup", handleSignup);
 
