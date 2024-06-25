@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Story title 1",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://bigsee.eu/wp-content/uploads/2018/07/49_029.jpg",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  },
+  {
+    "title": "Story title 2",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://bigsee.eu/wp-content/uploads/2018/07/49_011.jpg",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  },
+  {
+    "title": "Story title 3",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://bigsee.eu/wp-content/uploads/2018/07/56_028.jpg",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  },
+  {
+    "title": "Story title 4",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8N8urOlruxa-QdcOZqxjjKu4wyoda60iutEqpoPowUP8Rw0gOj2hZVRn-PYtH6yUoy6Q&usqp=CAU",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  },
+  {
+    "title": "Story title 4",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSywpmrrmDho_ViX6jGyg1cVB_YXyT0T-iFKf-rGxSRDx_1VGjKsDaPoEYO0Vn3-c6AeBM&usqp=CAU",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory","firststory","firststory","firststory","firststory","firststory"]
+  },
+  {
+    "title": "Story title 4",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqGzxwL5ooUlUmiVIjBJUvx0nwDdAXsVRDINxvliNIcerBcj3ZX9Sf30qNxeSC2w61lcU&usqp=CAU",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  },
+  {
+    "title": "Story title 4",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReWxbLBsFyEE1j-jLAl3_ywx_DZlqgl-8YMw&s",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  },
+  {
+    "title": "Story title 4",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut.",
+    "coverimg": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQW36ZXW2opkZSwlQRUBSIXR9sJobXGwEbBQ&s",
+    "likes": 5,
+    "views": 240,
+    "tags": ["horror", "suspence", "firststory"]
+  }
+]
