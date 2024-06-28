@@ -1,17 +1,29 @@
 const express = require("express");
+const authMiddleware = require("../middleware/authMiddleware.js");
+const upload = require("../middleware/multer.js");
 const {
+  handleGetMyProfile,
+  handleSetFullname,
   handleFollowRequest,
   handleUnfollowRequest,
   handleFollowerList,
   handleFollowingList,
-} = require("../controllers/ProfileController");
+  handleUploadProfilePic,
+} = require("../controllers/ProfileController.js");
+
 const Router = express.Router();
 
-Router.post("/follow/:followeeId", handleFollowRequest);
-Router.post("/unfollow/:followeeId", handleUnfollowRequest);
-Router.post("/followings/:id", handleFollowingList);
-// Router.post("/followers/:id", handleFollowerList);
-// Router.post("/followers/:id", handleFollowerList);
-// Router.post("/followers/:id", handleFollowerList);
+Router.get("/", authMiddleware, handleGetMyProfile);
+Router.post("/follow/:followeeId", authMiddleware, handleFollowRequest);
+Router.post("/unfollow/:followeeId", authMiddleware, handleUnfollowRequest);
+Router.get("/followings", authMiddleware, handleFollowingList);
+Router.get("/followers", authMiddleware, handleFollowerList);
+Router.post(
+  "/setprofilepic",
+  authMiddleware,
+  upload.single("file"),
+  handleUploadProfilePic
+);
+Router.post("/setfullname", authMiddleware, handleSetFullname);
 
 module.exports = Router;

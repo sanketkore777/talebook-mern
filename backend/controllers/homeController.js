@@ -6,7 +6,7 @@ const Tag = require("../models/Tag");
 
 const handleHomeRequest = async (req, res) => {
   try {
-    let { pageNo, search, tag, pageSize } = req.query;
+    let { pageNo, pageSize } = req.query;
     pageSize = parseInt(pageSize) || 15;
     pageNo = parseInt(pageNo) || 1;
 
@@ -17,14 +17,11 @@ const handleHomeRequest = async (req, res) => {
         { content: { $regex: search, $options: "i" } },
       ]; // Case-insensitive search on title and content
     }
-    if (tag) {
-      query.tags = tag; // Filter by tag
-    }
 
     // Fetch the stories with pagination
     const stories = await Story.find(query)
-      .skip((pageNo - 1) * pageSize)
-      .limit(pageSize)
+      .limit(pageSize * pageNo)
+      .populate("tags")
       .exec();
 
     const totalStories = await Story.countDocuments(query);
@@ -48,24 +45,10 @@ const handleNewPostRequest = async (req, res) => {
     const { path } = req.file;
     let { title, body, description, tags } = req.body; // Use req.body to get the request body
     if (typeof tags === "string") tags = tags.split(",");
-
-    const token = req.headers?.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).send({ error: "No token provided!" });
-    }
-
-    const _id = await jwt.authenticateJwtToken(token);
-    if (!_id) {
-      return res.status(401).send({ error: "Invalid token!" });
-    }
-
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(401).send({ error: "Unauthorized user!" });
-    }
+    const user = req.taleUser;
 
     const result = await cloudinary.uploader.upload(path, {
-      resource_type: "auto",
+      resource_type: "image",
     });
     if (!result.secure_url) {
       return res
@@ -97,32 +80,17 @@ const handleNewPostRequest = async (req, res) => {
     });
 
     await story.save();
-    res.status(201).send({ message: "Created!" });
+    return res.status(201).send({ message: "Created!" });
   } catch (error) {
     console.error("Something went wrong!", error);
-    if (!res.headersSent) {
-      res.status(500).send({ error: "Request failed!" });
-    }
+    return res.status(500).send({ error: "Request failed!" });
   }
 };
 const handleDeletePost = async (req, res) => {
   try {
     const { storyid } = req.params; // Assuming postId is passed as a URL parameter
-    const token = req.headers?.authorization.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).send({ error: "No token provided!" });
-    }
-
-    const _id = await jwt.authenticateJwtToken(token);
-    if (!_id) {
-      return res.status(401).send({ error: "Invalid token!" });
-    }
-
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(401).send({ error: "Unauthorized user!" });
-    }
+    const user = req.taleUser;
 
     const story = await Story.findById(storyid);
     if (!story) {
@@ -168,4 +136,88 @@ const handleDeletePost = async (req, res) => {
   }
 };
 
-module.exports = { handleHomeRequest, handleNewPostRequest, handleDeletePost };
+const handleSearch = async (req, res) => {
+  try {
+    const { searchTerm } = req.params;
+
+    if (!searchTerm) {
+      return res.status(400).json({ error: "Search term is required!" });
+    }
+
+    const userQuery = {
+      $or: [
+        { username: { $regex: searchTerm, $options: "i" } },
+        { email: { $regex: searchTerm, $options: "i" } },
+        { fullname: { $regex: searchTerm, $options: "i" } },
+      ],
+    };
+
+    const users = await User.find(userQuery).select(
+      "username email fullname profilePic"
+    );
+
+    // Case-insensitive search for stories by title or description
+    const storyQuery = {
+      $or: [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+      ],
+    };
+
+    const stories = await Story.find(storyQuery).select(
+      "title description poster"
+    );
+
+    res.status(200).json({
+      users,
+      stories,
+    });
+  } catch (error) {
+    console.error("Something went wrong!", error);
+    res.status(500).json({ error: "Internal Server Error!" });
+  }
+};
+
+const handleUserRecommendation = async (req, res) => {
+  try {
+    const userId = req.taleUser._id;
+
+    const user = await User.findById(userId).populate(
+      "followers",
+      "username email fullname profilePic"
+    );
+
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized user!" });
+    }
+
+    let recommendedUsers;
+
+    if (user.followers.length > 0) {
+      const followerIds = user.followers.map((follower) => follower._id);
+
+      recommendedUsers = await User.find({
+        _id: { $in: followerIds },
+        _id: { $ne: userId },
+      }).select("username email fullname profilePic");
+    } else {
+      recommendedUsers = await User.aggregate([
+        { $match: { _id: { $ne: userId } } },
+        { $sample: { size: 10 } },
+      ]).project("username email fullname profilePic");
+    }
+
+    res.status(200).json(recommendedUsers);
+  } catch (error) {
+    console.error("Something went wrong!", error);
+    res.status(500).json({ error: "Internal Server Error!" });
+  }
+};
+
+module.exports = {
+  handleUserRecommendation,
+  handleHomeRequest,
+  handleNewPostRequest,
+  handleDeletePost,
+  handleSearch,
+};

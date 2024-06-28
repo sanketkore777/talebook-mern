@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const jwt = require("../config/jwtProvider");
-
+const cloudinary = require("../utils/cloudinary");
 const handleFollowRequest = async (req, res) => {
   try {
     // Get the followee ID from the request body
@@ -9,17 +9,7 @@ const handleFollowRequest = async (req, res) => {
       return res.status(400).send({ error: "Followee ID is required!" });
     }
 
-    // Get the token from the authorization header
-    const token = req.headers?.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).send({ error: "No token provided!" });
-    }
-
-    // Authenticate the JWT token
-    const followerId = await jwt.authenticateJwtToken(token);
-    if (!followerId) {
-      return res.status(401).send({ error: "Invalid token!" });
-    }
+    const followerId = req.taleUser._id;
 
     // Find the follower and followee users
     const follower = await User.findById(followerId);
@@ -61,17 +51,7 @@ const handleUnfollowRequest = async (req, res) => {
       return res.status(400).send({ error: "Followee ID is required!" });
     }
 
-    // Get the token from the authorization header
-    const token = req.headers?.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).send({ error: "No token provided!" });
-    }
-
-    // Authenticate the JWT token
-    const followerId = await jwt.authenticateJwtToken(token);
-    if (!followerId) {
-      return res.status(401).send({ error: "Invalid token!" });
-    }
+    const followerId = req.taleUser._id;
 
     // Find the follower and followee users
     const follower = await User.findById(followerId);
@@ -113,7 +93,7 @@ const handleFollowingList = async (req, res) => {
     const userId = req.params.id;
     const user = await User.findById(userId).populate(
       "followings",
-      "username email fullname"
+      " _id username email fullname"
     );
 
     if (!user) {
@@ -133,7 +113,7 @@ const handleFollowerList = async (req, res) => {
     const userId = req.params.id;
     const user = await User.findById(userId).populate(
       "followers",
-      "username email fullname"
+      " _id username profilePic fullname"
     );
 
     if (!user) {
@@ -146,7 +126,64 @@ const handleFollowerList = async (req, res) => {
     res.status(500).send({ error: "Internal Server Error!" });
   }
 };
+const handleUploadProfilePic = async (req, res) => {
+  try {
+    const user = req.taleUser;
+
+    if (!req.file) {
+      return res.status(400).send({ error: "No file uploaded!" });
+    }
+    const { path } = req.file;
+    const result = await cloudinary.uploader
+      .upload(path, { resource_type: "image" }, (error, result) => {
+        if (error) {
+          return res.status(500).send({ error: "Failed to upload image!" });
+        }
+
+        user.profilePic = result.secure_url;
+        user.save();
+
+        return res.status(200).send({
+          message: "Profile picture updated successfully!",
+          profilePic: user.profilePic,
+        });
+      })
+      .end(req.file.buffer);
+  } catch (error) {
+    console.error("Something went wrong!", error);
+    return res.status(500).send({ error: "Internal Server Error!" });
+  }
+};
+const handleSetFullname = async (req, res) => {
+  try {
+    const user = req.taleUser;
+    user.fullname = req.body?.fullname;
+    await user.save();
+    res.status(201).send({ message: "Full name updated!" });
+  } catch (error) {
+    console.log(error),
+      res.status(400).send({ error: "Something went wrong!" });
+  }
+};
+const handleGetMyProfile = async (req, resp) => {
+  try {
+    const user = User.findById(req.taleUser._id).populate("Stories");
+    resp.status(200).send({
+      username: user.username,
+      _id: user._id,
+      fullName: user.fullname,
+      profilePic: user.profilePic,
+      stories: user.Stories,
+      follwers: user.followers,
+      followings: user.followings,
+    });
+  } catch (error) {}
+};
+
 module.exports = {
+  handleGetMyProfile,
+  handleUploadProfilePic,
+  handleSetFullname,
   handleFollowRequest,
   handleUnfollowRequest,
   handleFollowerList,

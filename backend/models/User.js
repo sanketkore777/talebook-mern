@@ -23,6 +23,11 @@ const UserSchema = new mongoose.Schema({
   fullname: {
     type: String,
   },
+  recentlyRead: [
+    {
+      type: String,
+    },
+  ],
   Stories: [
     {
       type: mongoose.Schema.Types.ObjectId,
