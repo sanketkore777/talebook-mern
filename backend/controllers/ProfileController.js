@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const jwt = require("../config/jwtProvider");
 const cloudinary = require("../utils/cloudinary");
+
 const handleFollowRequest = async (req, res) => {
   try {
     // Get the followee ID from the request body
@@ -134,21 +135,17 @@ const handleUploadProfilePic = async (req, res) => {
       return res.status(400).send({ error: "No file uploaded!" });
     }
     const { path } = req.file;
-    const result = await cloudinary.uploader
-      .upload(path, { resource_type: "image" }, (error, result) => {
-        if (error) {
-          return res.status(500).send({ error: "Failed to upload image!" });
-        }
-
-        user.profilePic = result.secure_url;
-        user.save();
-
-        return res.status(200).send({
-          message: "Profile picture updated successfully!",
-          profilePic: user.profilePic,
-        });
-      })
-      .end(req.file.buffer);
+    const result = await cloudinary.uploader.upload(path, {
+      resource_type: "image",
+    });
+    if (!result.secure_url) {
+      return res
+        .status(500)
+        .send({ error: "Failed to upload image, try again" });
+    }
+    user.profilePic = result.secure_url;
+    await user.save();
+    return res.status(500).send({ message: "Profile photo uploaded!" });
   } catch (error) {
     console.error("Something went wrong!", error);
     return res.status(500).send({ error: "Internal Server Error!" });
@@ -167,17 +164,26 @@ const handleSetFullname = async (req, res) => {
 };
 const handleGetMyProfile = async (req, resp) => {
   try {
-    const user = User.findById(req.taleUser._id).populate("Stories");
+    const user = await User.findById(req.taleUser._id).populate("Stories");
+
+    if (!user) {
+      return resp.status(404).send({ error: "User not found!" });
+    }
+
     resp.status(200).send({
+      status: "working fine",
       username: user.username,
       _id: user._id,
       fullName: user.fullname,
       profilePic: user.profilePic,
       stories: user.Stories,
-      follwers: user.followers,
+      followers: user.followers,
       followings: user.followings,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ error: "Failed!" });
+  }
 };
 
 module.exports = {

@@ -31,25 +31,25 @@ const UserSchema = new mongoose.Schema({
   Stories: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Story",
+      ref: "story",
     },
   ],
   followers: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   ],
-  follwings: [
+  followings: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
   ],
   favorites: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Story",
+      ref: "story",
     },
   ],
 });
