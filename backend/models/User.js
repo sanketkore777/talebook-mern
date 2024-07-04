@@ -25,7 +25,8 @@ const UserSchema = new mongoose.Schema({
   },
   recentlyRead: [
     {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "story",
     },
   ],
   Stories: [

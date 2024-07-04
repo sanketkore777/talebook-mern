@@ -10,28 +10,21 @@ const handleHomeRequest = async (req, res) => {
     pageSize = parseInt(pageSize) || 15;
     pageNo = parseInt(pageNo) || 1;
 
-    let query = {};
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { content: { $regex: search, $options: "i" } },
-      ]; // Case-insensitive search on title and content
-    }
-
     // Fetch the stories with pagination
-    const stories = await Story.find(query)
+    const stories = await Story.find({})
       .limit(pageSize * pageNo)
       .populate("tags")
+      .populate("user")
       .exec();
 
-    const totalStories = await Story.countDocuments(query);
+    const totalStories = await Story.countDocuments();
     res.status(200).json({
       totalPages: Math.ceil(totalStories / pageSize),
       totalStories,
       stories,
     });
   } catch (error) {
-    console.log("Server failed to fetch stories");
+    console.log("Server failed to fetch stories", error);
     res.status(500).send({ error: "Internal Server Error!" });
   }
 };

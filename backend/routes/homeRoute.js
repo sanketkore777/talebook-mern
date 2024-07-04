@@ -9,14 +9,14 @@ const {
   handleUserRecommendation,
 } = require("../controllers/homeController");
 
-Router.get("/home", authMiddleware, handleHomeRequest);
+Router.get("/", authMiddleware, handleHomeRequest);
 Router.post(
-  "/home/newstory",
+  "/newstory",
   authMiddleware,
   upload.single("file"),
   handleNewPostRequest
 );
-Router.post("/home/deletestory/:storyid", authMiddleware, handleDeletePost);
+Router.post("/deletestory/:storyid", authMiddleware, handleDeletePost);
 Router.get("/search/:searchTerm", authMiddleware, handleSearch);
 Router.get("/recommendations", authMiddleware, handleUserRecommendation);
 

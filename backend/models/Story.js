@@ -46,6 +46,10 @@ const StorySchema = mongoose.Schema({
       ref: "tag",
     },
   ],
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 const StoryModel = mongoose.model("story", StorySchema);

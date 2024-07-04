@@ -91,10 +91,10 @@ const handleUnfollowRequest = async (req, res) => {
 };
 const handleFollowingList = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.taleUser._id;
     const user = await User.findById(userId).populate(
       "followings",
-      " _id username email fullname"
+      " profilepic username email fullname"
     );
 
     if (!user) {
@@ -177,8 +177,8 @@ const handleGetMyProfile = async (req, resp) => {
       fullName: user.fullname,
       profilePic: user.profilePic,
       stories: user.Stories,
-      followers: user.followers,
-      followings: user.followings,
+      followers: user.followers.length,
+      followings: user.followings.length,
     });
   } catch (error) {
     console.log(error);
